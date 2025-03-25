@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chatbot with Supabase</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+  </head>
+  <body>
+    <div class="chat-container">
+      <h1>💬 Maruti Suzuki Sql Chatbot</h1>
+      <div id="chatbox"></div>
+      <textarea id="user-input" rows="3" placeholder="Ask me a question..."></textarea>
+      <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+      async function sendMessage() {
+        const messageText = document.getElementById("user-input").value;
+        if (!messageText.trim()) {
+          alert("Please enter a message.");
+          return;
+        }
+
+        // Display user message
+        displayMessage(`🧑‍💻 You: ${messageText}`);
+
+        // Send message to server
+        const response = await fetch("http://localhost:3000", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: messageText }),
+        });
+
+        const data = await response.json();
+        if (data.completion) {
+          displayMessage(`🤖 Bot: ${data.completion.content}`);
+        } else {
+          displayMessage("❌ Error: Unable to get response.");
+        }
+
+        // Clear input
+        document.getElementById("user-input").value = "";
+      }
+
+      function displayMessage(message) {
+        const chatbox = document.getElementById("chatbox");
+        const msgElement = document.createElement("p");
+
+        // Replace \n with <br> to preserve line breaks in HTML
+        msgElement.innerHTML = message.replace(/\n/g, "<br>");
+        chatbox.appendChild(msgElement);
+
+        // Auto-scroll to the bottom for new messages
+        chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    </script>
+  </body>
+</html>
